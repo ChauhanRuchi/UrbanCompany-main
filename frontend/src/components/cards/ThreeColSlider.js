@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Slider from "react-slick";
 import tw from "twin.macro";
 import styled from "styled-components";
@@ -11,6 +11,9 @@ import { ReactComponent as ChevronLeftIcon } from "feather-icons/dist/icons/chev
 import { ReactComponent as ChevronRightIcon } from "feather-icons/dist/icons/chevron-right.svg";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllCategory } from "store/categorySlice";
+
+import CategoryModal from "components/modal/categoryModal";
+
 
 
 const Container = tw.div`relative`;
@@ -127,15 +130,19 @@ export default () => {
     },
   ]
   const dispatch = useDispatch();
+  const [drawer,setDrawer]=useState(false);
   const data=useSelector((state)=>state?.category?.getdata);
 
     useEffect(()=>{
         dispatch(getAllCategory());
-    },[data]);
+    },[]);
 
   return (
     <Container>
+      {/* {getdrawer()} */}
       <Content>
+       {drawer && <CategoryModal  setDrawer={setDrawer} drawer={drawer} />}
+
         <HeadingWithControl>
           <Heading>Popular Services</Heading>
           <Controls>
@@ -145,7 +152,8 @@ export default () => {
         </HeadingWithControl>
         <CardSlider ref={setSliderRef} {...sliderSettings}>
           {data?.length && data.map((card, index) => (
-            <Card key={index}>
+            <Card key={index} onClick={()=>setDrawer(!drawer)}>
+
               <CardImage imageSrc={card.imageSrc} />
               <TextInfo>
                 <TitleReviewContainer>

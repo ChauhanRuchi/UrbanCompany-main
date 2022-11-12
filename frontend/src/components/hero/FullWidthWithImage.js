@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import tw from "twin.macro";
 import styled from "styled-components";
 import { css } from "styled-components/macro"; //eslint-disable-line
-import imgs from "../../images/HomePage.jpg"
-import Header, { LogoLink, NavLinks, NavLink as NavLinkBase } from "../headers/light.js";
+import imgs from "../../images/HomePage.jpg";
+import Header, {
+  LogoLink,
+  NavLinks,
+  NavLink as NavLinkBase,
+} from "../headers/light.js";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import { useSelector, useDispatch } from "react-redux";
+import { getsearch } from "store/searchSlice";
+import { useState } from "react";
 
 const StyledHeader = styled(Header)`
   ${tw`justify-between`}
@@ -24,7 +33,7 @@ const LeftColumn = tw.div`ml-8 mr-8 xl:pl-10 py-8`;
 //   ${tw`bg-green-500 bg-cover bg-center xl:ml-24 h-96 lg:h-auto lg:w-1/2 lg:flex-1`}
 // `;
 
-const RightColumn = styled.div(props => [
+const RightColumn = styled.div((props) => [
   `background-image: url("${props.imageSrc}");`,
   tw`bg-green-500 bg-cover bg-center xl:ml-24 h-96 lg:h-auto lg:w-1/2 lg:flex-1`,
 ]);
@@ -52,7 +61,7 @@ export default ({
       <NavLink href="#">Home</NavLink>
       <NavLink href="#">Blog</NavLink>
       <NavLink href="/login">Login/Signup</NavLink>
-    </NavLinks>
+    </NavLinks>,
   ],
   heading = (
     <>
@@ -65,8 +74,18 @@ export default ({
   primaryActionUrl = "#",
   primaryActionText = "Sign Up",
   secondaryActionUrl = "#",
-  secondaryActionText = "Search"
+  secondaryActionText = "Search",
 }) => {
+  const dispatch = useDispatch();
+  const [drawer, setDrawer] = useState(false);
+  const data = useSelector((state) => state?.search?.getdata);
+  useEffect(() => {
+    dispatch(getsearch());
+  }, []);
+  
+  const newdata = data?.map((item,index)=>item?.region);
+  console.log("Data", newdata)
+  
   return (
     <Container>
       <TwoColumn>
@@ -79,13 +98,30 @@ export default ({
               <a href={primaryActionUrl} className="action primaryAction">
                 {primaryActionText}
               </a>
-              <a href={secondaryActionUrl} className="action secondaryAction">
+              <Autocomplete
+                disablePortal
+                 key={Math.random()}
+                id="combo-box-demo"
+                options={newdata}
+                sx={{ width: 300 }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    InputProps={{
+                      ...params.InputProps,
+                      type: "search",
+                    }}
+                    label="Movie"
+                  />
+                )}
+              />
+              {/* <a href={secondaryActionUrl} className="action secondaryAction">
                 {secondaryActionText}
-              </a>
+              </a> */}
             </Actions>
           </Content>
         </LeftColumn>
-        <RightColumn imageSrc= {imgs}></RightColumn>
+        <RightColumn imageSrc={imgs}></RightColumn>
       </TwoColumn>
     </Container>
   );
